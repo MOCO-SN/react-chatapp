@@ -77,6 +77,21 @@ export const api = {
     return await res.text();
   },
 
+  getUser: async (uniqueId) => {
+    const formData = new FormData();
+    formData.append('unique_id', uniqueId);
+    const res = await fetch(`${API_BASE}/get-user.php`, {
+      method: 'POST',
+      body: formData,
+    });
+    const text = await res.text();
+    try {
+      return JSON.parse(text);
+    } catch {
+      return { error: text || 'Invalid response from server' };
+    }
+  },
+
   insertChat: async (uniqueId, incomingId, message) => {
     const formData = new FormData();
     formData.append('unique_id', uniqueId);

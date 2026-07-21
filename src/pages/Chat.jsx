@@ -7,13 +7,26 @@ export default function Chat() {
   const { user_id } = useParams();
   const [chatBox, setChatBox] = useState('');
   const [message, setMessage] = useState('');
-  const [receiver, _setReceiver] = useState(null);
+  const [receiver, setReceiver] = useState(null);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const chatBoxRef = useRef(null);
   const inputRef = useRef(null);
   const sendBtnRef = useRef(null);
-  const isMouseInChatBox = useRef(false);
+
+  const loadReceiver = useCallback(async () => {
+    if (!user || !user_id) return;
+    const data = await api.getUser(user_id);
+    if (data.success) {
+      setReceiver({
+        unique_id: data.unique_id,
+        fname: data.fname,
+        lname: data.lname,
+        img: data.img,
+        status: data.status,
+      });
+    }
+  }, [user, user_id]);
 
   const loadChat = useCallback(async () => {
     if (!user) return;
@@ -26,10 +39,11 @@ export default function Chat() {
       navigate('/login');
       return;
     }
+    loadReceiver();
     loadChat();
     const interval = setInterval(loadChat, 500);
     return () => clearInterval(interval);
-  }, [user, user_id, loadChat, navigate]);
+  }, [user, user_id, loadChat, loadReceiver, navigate]);
 
   const handleSend = async (e) => {
     e.preventDefault();
@@ -62,7 +76,7 @@ export default function Chat() {
           <Link to="/users" className="back-icon">
             <i className="fas fa-arrow-left"></i>
           </Link>
-          <img src={`/images/${receiver?.img || 'default.png'}`} alt="" />
+          {receiver && <img src={`/images/${receiver.img}`} alt="" />}
           <div className="details">
             <span>{receiver ? `${receiver.fname} ${receiver.lname}` : 'Chat'}</span>
             <p>{receiver?.status || ''}</p>

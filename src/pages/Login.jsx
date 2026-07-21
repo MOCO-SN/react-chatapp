@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../api';
 import { useAuth } from '../context/AuthContext';
 
@@ -8,22 +8,32 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const { login } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    const data = await api.login(email, password);
-    if (data.error) {
-      setError(data.error);
-    } else if (data.success) {
-      login({
-        unique_id: data.unique_id,
-        fname: data.fname,
-        lname: data.lname,
-        img: data.img,
-        status: data.status,
-      });
+    setLoading(true);
+    try {
+      const data = await api.login(email, password);
+      if (data.error) {
+        setError(data.error);
+      } else if (data.success) {
+        login({
+          unique_id: data.unique_id,
+          fname: data.fname,
+          lname: data.lname,
+          img: data.img,
+          status: data.status,
+        });
+        navigate('/users');
+      }
+    } catch {
+      setError('Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -58,7 +68,7 @@ export default function Login() {
             ></i>
           </div>
           <div className="field button">
-            <input type="submit" value="Continue to Chat" />
+            <input type="submit" value="Continue to Chat" disabled={loading} />
           </div>
         </form>
         <div className="link">

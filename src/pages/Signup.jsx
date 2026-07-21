@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../api';
 import { useAuth } from '../context/AuthContext';
 
@@ -11,31 +11,41 @@ export default function Signup() {
   const [image, setImage] = useState(null);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const { login } = useAuth();
+  const navigate = useNavigate();
   const fileInputRef = useRef(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    const formData = new FormData();
-    formData.append('fname', fname);
-    formData.append('lname', lname);
-    formData.append('email', email);
-    formData.append('password', password);
-    if (image) {
-      formData.append('image', image);
-    }
-    const data = await api.signup(formData);
-    if (data.error) {
-      setError(data.error);
-    } else if (data.success) {
-      login({
-        unique_id: data.unique_id,
-        fname: data.fname,
-        lname: data.lname,
-        img: data.img,
-        status: data.status,
-      });
+    setLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append('fname', fname);
+      formData.append('lname', lname);
+      formData.append('email', email);
+      formData.append('password', password);
+      if (image) {
+        formData.append('image', image);
+      }
+      const data = await api.signup(formData);
+      if (data.error) {
+        setError(data.error);
+      } else if (data.success) {
+        login({
+          unique_id: data.unique_id,
+          fname: data.fname,
+          lname: data.lname,
+          img: data.img,
+          status: data.status,
+        });
+        navigate('/users');
+      }
+    } catch {
+      setError('Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -109,7 +119,7 @@ export default function Signup() {
             />
           </div>
           <div className="field button">
-            <input type="submit" value="Continue to Chat" />
+            <input type="submit" value="Continue to Chat" disabled={loading} />
           </div>
         </form>
         <div className="link">
