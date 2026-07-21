@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/php/:path*",
+      "destination": "https://sachinchat.interiorsita.com/php/:path*"
+    },
+    {
+      "source": "/images/:path*",
+      "destination": "https://sachinchat.interiorsita.com/php/images/:path*"
+    }
+  ]
+}
