@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Users from './pages/Users';
 import Chat from './pages/Chat';
+import PhpServerChecker from './pages/PhpServerChecker';
 import './App.css';
 
 function ProtectedRoute({ children }) {
@@ -38,6 +39,7 @@ function AppRoutes() {
         <ProtectedRoute><Chat /></ProtectedRoute>
       } />
       <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="/server-check" element={<PhpServerChecker />} />
     </Routes>
   );
 }
